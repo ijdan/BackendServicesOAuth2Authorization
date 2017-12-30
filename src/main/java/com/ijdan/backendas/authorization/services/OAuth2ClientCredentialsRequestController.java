@@ -18,13 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 
-@Component
+@Service
 public class OAuth2ClientCredentialsRequestController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2ClientCredentialsRequestController.class);
     private static final String[] acceptedParameters = new String[]{"grant_type", "scope", "client_id", "client_secret"};

@@ -1,5 +1,6 @@
 package com.ijdan.backendas.authorization.services;
 
+
 import java.util.Base64;
 
 public class HttpBasicAuthenticationCredentials {

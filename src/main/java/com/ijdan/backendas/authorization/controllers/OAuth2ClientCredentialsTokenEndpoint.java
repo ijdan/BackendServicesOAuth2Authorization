@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.zip.DataFormatException;
 
@@ -80,7 +81,7 @@ public class OAuth2ClientCredentialsTokenEndpoint {
                         "");
                 return new ResponseEntity<>(err, HttpStatus.UNAUTHORIZED);
             }
-        }catch (IOException | DataFormatException ex) {
+        }catch (IOException | DataFormatException | ParseException ex) {
             throw new ExceptionsHandller("Could not initialize OAuth Service", ex);
         }
     }

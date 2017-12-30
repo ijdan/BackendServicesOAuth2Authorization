@@ -20,13 +20,13 @@ public class BackendServiceClient {
     @Column(name = "client_secret", nullable = false)
     private String clientSecret;
 
-    protected BackendServiceClient() {
-    }
+    @Column(name = "replaced", nullable = false)
+    private String replaced;
 
-    public BackendServiceClient(String id, String name, String clientId) {
-        this.id = id;
-        this.name = name;
-        this.clientId = clientId;
+    @Column(name = "updated", nullable = false)
+    private String updated;
+
+    protected BackendServiceClient() {
     }
 
     public String getId() {
@@ -61,6 +61,22 @@ public class BackendServiceClient {
         this.clientSecret = clientSecret;
     }
 
+    public String getReplaced() {
+        return replaced;
+    }
+
+    public void setReplaced(String replaced) {
+        this.replaced = replaced;
+    }
+
+    public String getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(String updated) {
+        this.updated = updated;
+    }
+
     @Override
     public String toString() {
         return "BackendServiceClient{" +
@@ -68,6 +84,8 @@ public class BackendServiceClient {
                 ", name='" + name + '\'' +
                 ", clientId='" + clientId + '\'' +
                 ", clientSecret='" + clientSecret + '\'' +
+                ", replaced='" + replaced + '\'' +
+                ", updated='" + updated + '\'' +
                 '}';
     }
 }
