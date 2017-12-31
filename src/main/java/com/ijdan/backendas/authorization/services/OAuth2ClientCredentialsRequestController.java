@@ -14,10 +14,10 @@ package com.ijdan.backendas.authorization.services;
 
 import com.ijdan.backendas.authorization.errors.OAuth2ClientCredentialsErrorResponseDetail;
 import com.ijdan.backendas.authorization.errors.OAuth2ClientCredentialsErrorResponse;
+import com.ijdan.backendas.authorization.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
@@ -37,25 +37,26 @@ public class OAuth2ClientCredentialsRequestController {
 
     }
 
-    public OAuth2ClientCredentialsErrorResponseDetail scanRequest (MultiValueMap<String, String> allParams, String authorization){
+    public Result scanRequest (MultiValueMap<String, String> allParams, String authorization){
         /**
          * Est-ce que les paramètres requis sont manquant ?
          * grant_type   : REQUIRED.  Value MUST be set to "client_credentials".
          * scope        : OPTIONAL.  The scope of the access request as described by
          * */
         if (!allParams.containsKey("grant_type")){
-            return new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.INVALID_REQUEST,
+            OAuth2ClientCredentialsErrorResponseDetail body = new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.INVALID_REQUEST,
                     "<grant_type> parameter omitted",
                     "");
+            return Result.fail(body);
         }
         /**
          * grant_type=client_credentials
          * */
         if (!allParams.getFirst("grant_type").equals("client_credentials")){
-            LOGGER.warn("allParams.getFirst(\"grant_type\") >>" + allParams.getFirst("grant_type"));
-            return new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.UNSUPPORTED_GRANT_TYPE,
+            OAuth2ClientCredentialsErrorResponseDetail body =  new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.UNSUPPORTED_GRANT_TYPE,
                     "Only <client_credentials> is supported",
                     "");
+            return Result.fail(body);
         }
 
         /**
@@ -63,9 +64,10 @@ public class OAuth2ClientCredentialsRequestController {
          * */
         for(int i = 0; i < acceptedParameters.length; i++){
             if (allParams.getOrDefault(acceptedParameters[i], new ArrayList<>()).size() > 1) {
-                return new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.INVALID_REQUEST,
-                        "Plusieurs occurences trouvées pour {"+ acceptedParameters[i] +"}",
+                OAuth2ClientCredentialsErrorResponseDetail body = new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.INVALID_REQUEST,
+                        "Several occurrences found for {"+ acceptedParameters[i] +"}",
                         "");
+                return Result.fail(body);
             }
         }
 
@@ -74,21 +76,22 @@ public class OAuth2ClientCredentialsRequestController {
          * */
         for(String k : allParams.keySet()){
             if (!Arrays.asList(acceptedParameters).contains(k)){
-                return new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.INVALID_REQUEST,
-                        "Paramètre non supporté {"+ k +"}",
+                OAuth2ClientCredentialsErrorResponseDetail body = new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.INVALID_REQUEST,
+                        "Not supported parameter {"+ k +"}",
                         "");
+                return Result.fail(body);
             }
         }
 
         if(authorization == null) {
-            return new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.INVALID_REQUEST,
-                    "Requête non authentifiée !",
+            OAuth2ClientCredentialsErrorResponseDetail body = new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.INVALID_REQUEST,
+                    "Not authenticated request !",
                     "");
+            return Result.fail(body);
         }
-        LOGGER.warn("authorization : {}", authorization);
 
         //success
-        return null;
+        return Result.success();
     }
 
 

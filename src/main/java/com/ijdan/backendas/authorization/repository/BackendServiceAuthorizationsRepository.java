@@ -8,4 +8,6 @@ import java.util.List;
 public interface BackendServiceAuthorizationsRepository extends CrudRepository<BackendServiceAuthorizations, String> {
 
     List<BackendServiceAuthorizations> findByClientId(String clientId);
+    List<BackendServiceAuthorizations> findAll();
+
 }

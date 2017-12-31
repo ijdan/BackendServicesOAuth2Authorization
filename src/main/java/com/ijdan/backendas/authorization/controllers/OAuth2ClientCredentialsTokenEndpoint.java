@@ -1,8 +1,10 @@
 package com.ijdan.backendas.authorization.controllers;
 
 import com.ijdan.backendas.authorization.entities.BackendServiceAuthorizations;
+import com.ijdan.backendas.authorization.entities.BackendServiceClient;
 import com.ijdan.backendas.authorization.errors.OAuth2ClientCredentialsErrorResponse;
 import com.ijdan.backendas.authorization.exception.ExceptionsHandller;
+import com.ijdan.backendas.authorization.model.Result;
 import com.ijdan.backendas.authorization.services.OAuth2BasicAuthenticationController;
 import com.ijdan.backendas.authorization.services.OAuth2AuthorizationController;
 import com.ijdan.backendas.authorization.services.OAuth2ClientCredentialsRequestController;
@@ -46,43 +48,40 @@ public class OAuth2ClientCredentialsTokenEndpoint {
     @ResponseStatus(HttpStatus.OK)
     ResponseEntity getAccessToken(
             @RequestParam MultiValueMap<String, String> requestParameters,
-            @RequestHeader(value = "Authorization", required = false) String authorization,
-            HttpServletRequest httpRequest
+            @RequestHeader(value = "Authorization", required = false) String authorization
     ) throws ExceptionsHandller {
-        OAuth2ClientCredentialsErrorResponseDetail err = null;
+
+        Result result = null;
         try {
-            err = oAuth2ClientCredentialsRequestController.scanRequest(requestParameters, authorization);
-            if (err != null){
-                //Requête mal construite
-                return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
+            //Request validator
+            result = oAuth2ClientCredentialsRequestController.scanRequest(requestParameters, authorization);
+            if (!result.isSuccess()){
+                return new ResponseEntity<>(result.getBody(), HttpStatus.BAD_REQUEST);
             }
 
-            err = oAuth2BasicAuthenticationController.scanRequest(requestParameters, authorization);
-            if (err != null){
-                //Erreur dans la partie credentials
-                return new ResponseEntity<>(err, HttpStatus.UNAUTHORIZED);
+            //Authentication
+            result = oAuth2BasicAuthenticationController.scanRequest(requestParameters, authorization);
+            if (!result.isSuccess()){
+                return new ResponseEntity<>(result.getBody(), HttpStatus.UNAUTHORIZED);
             }
-            /**
-             * Authentification réussie
-             * Récupération des autorisations.
-             * 2 cas : récupère autorisation et aucune autorisation
-             * */
-            String clientId = oAuth2BasicAuthenticationController.getHttpClientId();
+
+            //Authorization
+            BackendServiceClient backendServiceClient = (BackendServiceClient) result.getBody();
+            String clientId = backendServiceClient.getClientId();
+
             List<BackendServiceAuthorizations> bSA = oAuth2AuthorizationController.getServiceAuthorisations(clientId);
-            if (bSA.size() > 0){
-                /**
-                 * Autorisations trouvées.
-                 * Création de l'access_token associé
-                 * */
-                return new ResponseEntity<>(new OAuth2SuccessResponse(clientId, bSA), HttpStatus.OK);
-            }else{
-                err = new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.UNAUTHORIZED_CLIENT,
-                        "Unauthorized Client <"+clientId+">",
+            if (bSA.size() == 0){
+                //authorization not found
+                OAuth2ClientCredentialsErrorResponseDetail body = new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.UNAUTHORIZED_CLIENT,
+                        "Unauthorized Client <"+clientId+">.",
                         "");
-                return new ResponseEntity<>(err, HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+            }else{
+                //access_token
+                return new ResponseEntity<>(new OAuth2SuccessResponse(clientId, bSA), HttpStatus.OK);
             }
         }catch (IOException | DataFormatException | ParseException ex) {
-            throw new ExceptionsHandller("Could not initialize OAuth Service", ex);
+            throw new ExceptionsHandller("Could not initialize OAuth Service.", ex);
         }
     }
 }
