@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface BackendServiceClientRepository extends CrudRepository<BackendServiceClient, String> {
+public interface IBackendServiceClientRepository extends CrudRepository<BackendServiceClient, String> {
     BackendServiceClient findByClientIdAndClientSecret(String clientId, String clientSecret);
     List<BackendServiceClient> findAll();
 

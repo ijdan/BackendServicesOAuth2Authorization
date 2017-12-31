@@ -8,7 +8,7 @@ import com.ijdan.backendas.authorization.entities.BackendServiceClient;
 import com.ijdan.backendas.authorization.errors.OAuth2ClientCredentialsErrorResponseDetail;
 import com.ijdan.backendas.authorization.errors.OAuth2ClientCredentialsErrorResponse;
 import com.ijdan.backendas.authorization.model.Result;
-import com.ijdan.backendas.authorization.repository.BackendServiceClientRepository;
+import com.ijdan.backendas.authorization.repository.IBackendServiceClientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class OAuth2BasicAuthenticationController {
     private static final long DELAY_EXPIRATION_CREDENTIALS = 1;
 
     @Autowired
-    private BackendServiceClientRepository backendServiceClientRepository;
+    private IBackendServiceClientRepository IBackendServiceClientRepository;
 
     public OAuth2BasicAuthenticationController() {
     }
@@ -62,7 +62,7 @@ public class OAuth2BasicAuthenticationController {
         /**
          * Check authentication
          * */
-        BackendServiceClient backendServiceClient = backendServiceClientRepository.findByClientIdAndClientSecret(clientId, clientSecret);
+        BackendServiceClient backendServiceClient = IBackendServiceClientRepository.findByClientIdAndClientSecret(clientId, clientSecret);
         if (backendServiceClient == null){
             OAuth2ClientCredentialsErrorResponseDetail body = new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.INVALID_CLIENT,
                     "Authentication failed <"+ clientId +">.",

@@ -5,9 +5,8 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface BackendServiceAuthorizationsRepository extends CrudRepository<BackendServiceAuthorizations, String> {
+public interface IBackendServiceAuthorizationsRepository extends CrudRepository<BackendServiceAuthorizations, String> {
 
     List<BackendServiceAuthorizations> findByClientId(String clientId);
     List<BackendServiceAuthorizations> findAll();
-
 }
