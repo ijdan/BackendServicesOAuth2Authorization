@@ -9,13 +9,20 @@ server:
 # ===============================
 access_token:
   alg: RSA256
-  expiration_time: 900
+  expirationTime: 900
   issuer: https://www.authorization-server.com
-  key_id: a64bb46f-8a6d-4349-a537-149b07099b28
+  keyId: a64bb46f-8a6d-4349-a537-149b07099b28
   certificate:
     password: pass
     path: certificates/sa_certificate.p12
     type: PKCS12
+
+# ===============================
+# = Cache
+# ===============================
+cache:
+  retryDelay: 30 #seconds
+  enabled: true
 
 # ===============================
 # = Spring
@@ -24,30 +31,31 @@ spring:
   security:
     ignored: /**
     enabled: false
-  datasource:
-    platform: h2
-    url: jdbc:h2:mem:credentialdb;MVCC=true;DB_CLOSE_DELAY=-1;MODE=Oracle
-    username: sa
-    password: sa
-    driverClassName: org.h2.Driver
-#    schema: classpath:schema.sql
-#    data: classpath:data.sql
+
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        show_sql: false
-        use_sql_comments: false
-        format_sql: true
+    show-sql: true
+    database: default
+
+  datasource:
+    #POSTGRESQL
+    url: jdbc:postgresql://localhost:5432/backend-services
+    username: postgres
+    password: pass
   h2:
+    #H2
     console:
       enabled: true
       path: /h2
       settings:
         trace: false
         web-allow-others: false
+    url: jdbc:h2:mem:backend-services;MVCC=true;DB_CLOSE_DELAY=-1;MODE=Oracle
+    username: h2
+    password: pass
+    initialize: true
+    driverClassName: org.h2.Driver
+    schema: classpath:schema_h2.sql
+    data: classpath:data_h2.sql
 
 # *** To disable/enable Spring Security ***
 management:
@@ -66,7 +74,7 @@ logging:
     ROOT: INFO
     org:
       hibernate:
-        SQL: DEBUG
+        SQL: WARN
         type:
           descriptor:
             sql:

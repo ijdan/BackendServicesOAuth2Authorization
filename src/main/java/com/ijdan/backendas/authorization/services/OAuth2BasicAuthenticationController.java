@@ -4,11 +4,11 @@
  * */
 package com.ijdan.backendas.authorization.services;
 
-import com.ijdan.backendas.authorization.entities.BackendServiceClient;
 import com.ijdan.backendas.authorization.errors.OAuth2ClientCredentialsErrorResponseDetail;
 import com.ijdan.backendas.authorization.errors.OAuth2ClientCredentialsErrorResponse;
+import com.ijdan.backendas.authorization.infra.db.IBackendServiceClientProjection;
 import com.ijdan.backendas.authorization.model.Result;
-import com.ijdan.backendas.authorization.repository.IBackendServiceClientRepository;
+import com.ijdan.backendas.authorization.infra.db.nominal.repo.IServiceNominalRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class OAuth2BasicAuthenticationController {
     private static final long DELAY_EXPIRATION_CREDENTIALS = 1;
 
     @Autowired
-    private IBackendServiceClientRepository IBackendServiceClientRepository;
+    private IServiceNominalRepository IServiceNominalRepository;
 
     public OAuth2BasicAuthenticationController() {
     }
@@ -62,8 +62,8 @@ public class OAuth2BasicAuthenticationController {
         /**
          * Check authentication
          * */
-        BackendServiceClient backendServiceClient = IBackendServiceClientRepository.findByClientIdAndClientSecret(clientId, clientSecret);
-        if (backendServiceClient == null){
+        IBackendServiceClientProjection ibscp = IServiceNominalRepository.findByClientIdAndClientSecret(clientId, clientSecret);
+        if (ibscp == null){
             OAuth2ClientCredentialsErrorResponseDetail body = new OAuth2ClientCredentialsErrorResponseDetail(OAuth2ClientCredentialsErrorResponse.INVALID_CLIENT,
                     "Authentication failed <"+ clientId +">.",
                     "");
@@ -74,9 +74,9 @@ public class OAuth2BasicAuthenticationController {
          * Check if credentials are expired
          * DELAY_EXPIRATION_CREDENTIALS
          * */
-        if (backendServiceClient.getReplaced().equals("1")){
+        if (ibscp.getReplaced().equals("1")){
             SimpleDateFormat datePattern = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date dateUpdated = datePattern.parse(backendServiceClient.getUpdated());
+            Date dateUpdated = datePattern.parse(ibscp.getUpdated());
             Date now = new Date();
             long daysBefore = TimeUnit.DAYS.convert(now.getTime() - dateUpdated.getTime(), TimeUnit.MILLISECONDS);
             if (daysBefore > DELAY_EXPIRATION_CREDENTIALS){
@@ -90,7 +90,7 @@ public class OAuth2BasicAuthenticationController {
         /**
          * Return Client object
          * */
-        return Result.success(backendServiceClient);
+        return Result.success(ibscp);
     }
 
 }

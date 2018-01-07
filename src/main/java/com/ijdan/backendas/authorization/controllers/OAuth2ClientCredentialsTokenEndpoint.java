@@ -1,7 +1,7 @@
 package com.ijdan.backendas.authorization.controllers;
 
-import com.ijdan.backendas.authorization.entities.BackendServiceAuthorizations;
-import com.ijdan.backendas.authorization.entities.BackendServiceClient;
+import com.ijdan.backendas.authorization.infra.db.IBackendServiceClientProjection;
+import com.ijdan.backendas.authorization.infra.db.nominal.domain.BackendServiceAuthorizations;
 import com.ijdan.backendas.authorization.errors.OAuth2ClientCredentialsErrorResponse;
 import com.ijdan.backendas.authorization.exception.ExceptionsHandller;
 import com.ijdan.backendas.authorization.model.Result;
@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
@@ -66,8 +65,8 @@ public class OAuth2ClientCredentialsTokenEndpoint {
             }
 
             //Authorization
-            BackendServiceClient backendServiceClient = (BackendServiceClient) result.getBody();
-            String clientId = backendServiceClient.getClientId();
+            IBackendServiceClientProjection ibscp = (IBackendServiceClientProjection) result.getBody();
+            String clientId = ibscp.getClientId();
 
             List<BackendServiceAuthorizations> bSA = oAuth2AuthorizationController.getServiceAuthorisations(clientId);
             if (bSA.size() == 0){

@@ -40,8 +40,6 @@ public class CertificateManager {
     }
 
     public Keys keys () throws ExceptionsHandller {
-        CertificateManager cm = new CertificateManager();
-
         password = password == null ? DEFAULT_PASSWORD : password;
         path = path == null ? DEFAULT_CERTIFICATE_PATH : path;
         type = type == null ? DEFAULT_TYPE_KS : type;

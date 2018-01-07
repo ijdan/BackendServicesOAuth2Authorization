@@ -1,7 +1,7 @@
 package com.ijdan.backendas.authorization.services;
 
-import com.ijdan.backendas.authorization.entities.BackendServiceAuthorizations;
-import com.ijdan.backendas.authorization.repository.IBackendServiceAuthorizationsRepository;
+import com.ijdan.backendas.authorization.infra.db.nominal.domain.BackendServiceAuthorizations;
+import com.ijdan.backendas.authorization.infra.db.nominal.repo.IServiceAuthorizationNominalRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +14,13 @@ public class OAuth2AuthorizationController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2AuthorizationController.class);
 
     @Autowired
-    private IBackendServiceAuthorizationsRepository IBackendServiceAuthorizationsRepository;
+    private IServiceAuthorizationNominalRepository IServiceAuthorizationNominalRepository;
 
     public OAuth2AuthorizationController() {
     }
 
     public List<BackendServiceAuthorizations> getServiceAuthorisations(String clientId){
-        return IBackendServiceAuthorizationsRepository.findByClientId(clientId);
+        return IServiceAuthorizationNominalRepository.findByClientId(clientId);
     }
 
 }

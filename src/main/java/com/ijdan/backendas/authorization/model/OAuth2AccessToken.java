@@ -18,11 +18,11 @@ public class OAuth2AccessToken {
     private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2AccessToken.class);
 
     private static String DEFAULT_CURRENT_KID = "e9bc097a-ce51-4036-9562-d2ade882db0d";
-    @Value("${key_id}")
+    @Value("${keyId}")
     private static String keyId;
 
     private static final int DEFAULT_EXPIRATION_TIME = 10;
-    @Value("${expiration_time}")
+    @Value("${expirationTime}")
     private static String expirationTime;
 
 
